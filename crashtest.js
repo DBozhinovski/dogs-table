@@ -1,15 +1,34 @@
 let editMode = false; // whether we're editing or adding a new dog
 let editIndex = null; // we also want to keep track of which index we're editing!
-let dogs = []; // the list of all our dogs
+let animals = []; // the list of all our animals
 
 
-// The "Dog" class (data type) we will create instances from
-class Dog {
+class Animal {
   constructor(name, color) {
     this.name = name;
     this.color = color;
   }
 }
+
+// The "Dog" class (data type) we will create instances from
+class Dog extends Animal {
+  constructor(name, color) {
+    super(name, color);
+    this.animalType = 'dog';
+  }
+}
+
+class Cat extends Animal {
+  constructor(name, color) {
+    super(name, color);
+    this.animalType = 'cat';
+  }
+}
+
+let animalTypes = {
+  dog: Dog,
+  cat: Cat,
+};
 
 // A utility function which re-draws the table on each change
 // The point is to have a single source of truth - in other words
@@ -21,7 +40,7 @@ function drawTable() {
   tbody.innerHTML = ""; // Reset the contents of the tbody when drawing
 
   // Iterate through every available dog
-  dogs.forEach(function(dog, i) {
+  animals.forEach(function(dog, i) {
     // Create all out TDs and TRs:
     let tr = document.createElement('tr');
     let nameTd = document.createElement('td');
@@ -68,7 +87,7 @@ function drawTable() {
       let indexToDelete = i; //
 
       // Remove one element - the dog we want to delete
-      dogs.splice(i, 1);
+      animals.splice(i, 1);
 
       // And redraw the table again
       // Aside: a function can call itself in JS ;)
@@ -85,22 +104,28 @@ function drawTable() {
 function handleAdd() {
   let nameInput = document.querySelector('#name');
   let colorInput = document.querySelector('#color');
+  let typeInput = document.querySelector('select');
 
   if (editMode) {
     // If it's an existing dog, we look for the index
     // and change the properties of that dog instance;
     // we don't need a new one, since we're editing.
-    dogs[editIndex].name = nameInput.value;
-    dogs[editIndex].color = colorInput.value;
+    animals[editIndex].name = nameInput.value;
+    animals[editIndex].color = colorInput.value;
+    animals[editIndex].animalType = typeInput.value;
 
     // IMPORTANT: we need to reset both editMode and editIndex after we're done here!
     // Otherwise, it will always remain in edit mode and we won't be able to add
-    // new dogs.
+    // new animals.
     editMode = false;
     editIndex = null;
   } else {
-    let dog = new Dog(nameInput.value, colorInput.value);
-    dogs.push(dog);
+    let type = typeInput.value;
+
+    let AnimalClass = animalTypes[type];
+    // let dog = new Dog(nameInput.value, colorInput.value);
+    let newAnimal = new AnimalClass(nameInput.value, colorInput.value, typeInput.value);
+    animals.push(newAnimal);
   }
 
   // Always redraw the table, to avoid differences between the array and the table in the DOM
